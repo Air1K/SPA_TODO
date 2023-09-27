@@ -1,0 +1,85 @@
+.main {
+  max-width: 800px;
+}
+
+.add_block {
+  border: 2.5px dashed #ffb45e;
+  height: 2.4rem;
+  border-radius: 2.5rem;
+  width: 100%;
+  cursor: pointer;
+  position: relative;
+  color: #ffb45e;
+}
+.add_block:before {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  bottom: 5px;
+  right: 5px;
+  border-radius: 2.5rem;
+  content: "";
+  border: 2.5px solid #ffb45e;
+}
+.add_block svg {
+  width: 20px;
+  height: 20px;
+  filter: invert(89%) sepia(10%) saturate(3444%) hue-rotate(318deg) brightness(100%) contrast(103%);
+}
+.add_block:hover {
+  transform: scale(1.01);
+  border: 2.5px dashed #ffa537;
+  color: #ffa537;
+}
+.add_block:hover:before {
+  border: 2.5px solid #ffa537;
+}
+.add_block:hover svg {
+  filter: invert(79%) sepia(7%) saturate(7427%) hue-rotate(331deg) brightness(103%) contrast(101%);
+}
+
+.row {
+  position: relative;
+  height: 3rem;
+  color: white;
+  cursor: pointer;
+}
+.row:after {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgb(108, 117, 125);
+  background: linear-gradient(90deg, rgb(108, 117, 125) 0%, rgb(128, 128, 128) 100%);
+  border-radius: 2rem;
+  z-index: -2;
+}
+.row:before {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 2rem;
+  z-index: -1;
+  background: linear-gradient(90deg, rgb(128, 128, 128) 0%, rgb(108, 117, 125) 100%);
+  opacity: 0;
+  -webkit-box-shadow: 0px 0px 7px 4px rgba(34, 60, 80, 0.2);
+  -moz-box-shadow: 0px 0px 7px 4px rgba(34, 60, 80, 0.2);
+  box-shadow: 0px 0px 7px 4px rgba(34, 60, 80, 0.2);
+}
+.row:hover {
+  transform: scale(1.01) !important;
+}
+.row:hover:before {
+  opacity: 1;
+}
+
+.button_project > svg {
+  margin-left: 0.5rem;
+}
+
+/*# sourceMappingURL=project-style.module.css.map */

@@ -1,0 +1,45 @@
+.transition_v1{
+  transition: 300ms cubic-bezier(.32,-1.29,.46,1.89);
+}
+.transition_v2 {
+  transition: 300ms cubic-bezier(.11, .86, .47, 1);
+  &:before {
+    transition: 1000ms cubic-bezier(.11, .86, .47, 1);
+  }
+}
+p{
+  font-size: 1.1rem;
+  font-weight: 300;
+}
+html{
+  font-size: clamp(14px, 5vw, 19px);
+}
+input {
+  //font-size: 19px !important;
+  //&~label{
+  //  font-size: 14px;
+  //}
+}
+.svg_delete, .svg_edit{
+  width: 1.5rem;
+  height: 1.5rem;
+  &:hover{
+    transform: scale(1.1);
+  }
+}
+.svg_delete{
+
+  &:hover{
+    filter: drop-shadow(2px 2px 2px #CE5937) !important;
+  }
+}
+.svg_edit{
+  &:hover{
+    filter: drop-shadow(2px 2px 2px rgb(217, 217, 52)) !important;
+  }
+  //color: rgba(255, 255, 0, 0.55);
+}
+a{
+  color: black;
+  text-decoration: none;
+}

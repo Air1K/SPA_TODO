@@ -1,0 +1,42 @@
+.transition_v1 {
+  transition: 300ms cubic-bezier(0.32, -1.29, 0.46, 1.89);
+}
+
+.transition_v2 {
+  transition: 300ms cubic-bezier(0.11, 0.86, 0.47, 1);
+}
+.transition_v2:before {
+  transition: 1000ms cubic-bezier(0.11, 0.86, 0.47, 1);
+}
+
+p {
+  font-size: 1.1rem;
+  font-weight: 300;
+}
+
+html {
+  font-size: clamp(14px, 5vw, 19px);
+}
+
+.svg_delete, .svg_edit {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.svg_delete:hover, .svg_edit:hover {
+  transform: scale(1.1);
+}
+
+.svg_delete:hover {
+  filter: drop-shadow(2px 2px 2px #CE5937) !important;
+}
+
+.svg_edit:hover {
+  filter: drop-shadow(2px 2px 2px rgb(217, 217, 52)) !important;
+}
+
+a {
+  color: black;
+  text-decoration: none;
+}
+
+/*# sourceMappingURL=app.css.map */

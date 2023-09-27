@@ -1,0 +1,48 @@
+.back{
+  color: white;
+  background-color: rgb(108,117,125);
+  top: 0.35rem;
+  left: 0.35rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 1rem;
+  >svg{
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  &:hover{
+    transform: scale(1.05);
+  }
+}
+.main{
+}
+.col{
+  min-height: calc(100vh - 10.3rem);
+  >.head{
+    background-color: rgb(108,117,125);
+    color: white;
+    border-radius: 1rem;
+    height: 1.8rem;
+    >h5{
+      font-weight: 700;
+    }
+  }
+  >.body{
+    margin-top: calc(var(--bs-gutter-x));
+    background-color: rgba(108, 117, 125, 0.16);
+    height: 100%;
+    border-radius: 1rem;
+  }
+}
+//.task_add{
+//  padding-top: 0 !important;
+//  &:before{
+//    top: 0.15rem;
+//
+//  }
+//  &:hover {
+//    &:before {
+//      bottom: 0.1rem;
+//    }
+//  }
+//}

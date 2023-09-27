@@ -1,0 +1,37 @@
+.back {
+  color: white;
+  background-color: rgb(108, 117, 125);
+  top: 0.35rem;
+  left: 0.35rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 1rem;
+}
+.back > svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.back:hover {
+  transform: scale(1.05);
+}
+
+.col {
+  min-height: calc(100vh - 10.3rem);
+}
+.col > .head {
+  background-color: rgb(108, 117, 125);
+  color: white;
+  border-radius: 1rem;
+  height: 1.8rem;
+}
+.col > .head > h5 {
+  font-weight: 700;
+}
+.col > .body {
+  margin-top: calc(var(--bs-gutter-x));
+  background-color: rgba(108, 117, 125, 0.16);
+  height: 100%;
+  border-radius: 1rem;
+}
+
+/*# sourceMappingURL=task-style.module.css.map */
