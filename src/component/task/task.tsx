@@ -25,9 +25,12 @@ const Exit = () => {
 }
 const Task = () => {
    const [searchParams, setSearchParams] = useSearchParams();
+
    const dispatch = useDispatch()
    const project = useSelector((state: Root) => state.project.project)
    const tasks = useSelector((state: Root) => state.task.task.filter(task => task.project_id === Number(searchParams.get('_id'))))
+
+
    const [modalShow, setModalShow] = useState(false)
    const [edit, setEdit] = useState(null)
    const [errors, setErrors] = useState({})

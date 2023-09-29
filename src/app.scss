@@ -9,6 +9,9 @@
 }
 .transition_v2{
   transition: 300ms cubic-bezier(.11, .86, .47, 1);
+  &:before {
+    transition: 1000ms cubic-bezier(.11, .86, .47, 1);
+  }
 }
 p{
   font-size: 1.1rem;
