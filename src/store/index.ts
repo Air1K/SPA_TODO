@@ -1,5 +1,4 @@
-import {combineReducers, createStore} from "redux";
-// legacy_createStore as createStore
+import {combineReducers, legacy_createStore as createStore} from "redux";
 import {projectReducer} from "./project";
 import {taskReducer} from "./task";
 const rootReducer = combineReducers({

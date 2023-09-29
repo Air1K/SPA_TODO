@@ -1,11 +1,14 @@
 .transition_v1{
   transition: 300ms cubic-bezier(.32,-1.29,.46,1.89);
 }
-.transition_v2 {
+.hover_task {
   transition: 300ms cubic-bezier(.11, .86, .47, 1);
   &:before {
     transition: 1000ms cubic-bezier(.11, .86, .47, 1);
   }
+}
+.transition_v2{
+  transition: 300ms cubic-bezier(.11, .86, .47, 1);
 }
 p{
   font-size: 1.1rem;
@@ -42,4 +45,7 @@ input {
 a{
   color: black;
   text-decoration: none;
+}
+.accordion-body{
+  background-color: rgba(108, 117, 125, 0.35) !important;
 }

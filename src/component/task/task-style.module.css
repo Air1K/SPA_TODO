@@ -17,6 +17,7 @@
 
 .col {
   min-height: calc(100vh - 10.3rem);
+  max-width: 430.5px;
 }
 .col > .head {
   background-color: rgb(108, 117, 125);
@@ -28,10 +29,42 @@
   font-weight: 700;
 }
 .col > .body {
-  margin-top: calc(var(--bs-gutter-x));
+  margin-top: 0.5rem;
   background-color: rgba(108, 117, 125, 0.16);
   height: 100%;
   border-radius: 1rem;
+}
+
+.row_task {
+  word-wrap: break-word;
+}
+.row_task > div > h2 > button {
+  background-color: rgb(108, 117, 125);
+  color: white;
+}
+
+.body_task div > span {
+  color: rgb(108, 117, 125);
+  font-weight: bold;
+}
+
+@media (max-width: 1400px) {
+  .group_button {
+    flex-direction: column;
+  }
+  .group_button > button {
+    margin-top: 0.5rem;
+  }
+}
+@media (max-width: 768px) {
+  .group_button > button {
+    flex-direction: column;
+  }
+}
+@media (max-width: 576px) {
+  .group_button > button {
+    flex-direction: row;
+  }
 }
 
 /*# sourceMappingURL=task-style.module.css.map */

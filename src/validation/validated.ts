@@ -15,7 +15,7 @@ export const validateFormAddProject = (form)=>{
 }
 
 export const vakidateFromAddTask = (from) => {
-    const {head_task, body_task} = from
+    const {head_task, body_task, files_task} = from
     const formErrors = {}
     const stateErr = {}
     const validateHeadTask = isValidHeadTask(head_task);
@@ -32,6 +32,13 @@ export const vakidateFromAddTask = (from) => {
     }else {
         stateErr["body_task"] = true;
     }
+    const validateFileTask = isValidFileTask(files_task);
+    if(!!validateFileTask) {
+        stateErr["files_task"] = false;
+        formErrors["files_task"] = validateFileTask;
+    }else {
+        stateErr["files_task"] = true;
+    }
     return {formErrors, stateErr}
 }
 // function isValidateUserName(userName){
@@ -45,19 +52,20 @@ function isValidName(name) {
     else if(name.length < 2) return "Слишком короткое название, минимальная длина 2 символа"
     else if(name === undefined || name === null) return "Значение названия не определенно"
 }
-
 function isValidHeadTask(head_task){
     if(!head_task || head_task === '') return "Пожалуйста укажите заголовок"
     else if(head_task.length > 50) return "Слишком длинный заголовок, максимальная длина 30 символов"
     else if(head_task.length < 2) return "Слишком короткий заголовок, минимальная длина 2 символа"
     else if(head_task === undefined || head_task === null) return "Значение названия не определенно"
 }
-
 function isValidBodyTask(body_task) {
     if(!body_task || body_task === '') return "Пожалуйста укажите описание"
     else if(body_task.length > 300) return "Слишком длинный заголовок, максимальная длина 300 символов"
     else if(body_task.length < 2) return "Слишком короткий заголовок, минимальная длина 2 символа"
     else if(body_task === undefined || body_task === null) return "Значение названия не определенно"
+}
+function isValidFileTask(file_task){
+    if(file_task.size > 500000) return "Слишком большой размер файла максимальный размер 500КБ"
 }
 //
 // function isValidatePassword(password){

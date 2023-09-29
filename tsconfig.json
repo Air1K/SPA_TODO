@@ -10,6 +10,9 @@
     "lib": [
       "dom",
       "es7"
+    ],
+    "types": [
+      "node"
     ]
   }
 }

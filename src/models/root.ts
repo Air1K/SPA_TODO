@@ -15,14 +15,15 @@ interface StateProject{
 }
 
 class StateTask{
+   project_id: number
    id: number;
    head_task: string;
    body_task: string;
    date_of_creat: Date;
-   time_at_work: number;
+   time_at_work: Date;
    date_end: Date;
-   priority: string;
-   files_task: string;
+   priority: number;
+   files_task: MyFile;
    status: string;
    subtasks: StateTask[] = [];
    comments: Comments[] = [];
@@ -31,4 +32,7 @@ class Comments{
    name_user: string = 'Default user';
    date: Date;
    comment: string;
+}
+export interface MyFile extends File {
+   readonly lastModifiedDate: Date;
 }
