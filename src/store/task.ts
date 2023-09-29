@@ -61,7 +61,6 @@ const localStoreSave = (task, typ = null)=> {
       readSingleFile(task.task[i].files_task, !typ?task.task[i].id:typ)
    }
    localStorage.setItem('task', JSON.stringify(tasks))
-   localStorage.setItem('task', JSON.stringify(tasks))
 }
 function readSingleFile(file, id) {
    if (file) {
