@@ -4,3 +4,21 @@
     font-weight: bold;
   }
 }
+.add_sub{
+  color: #ffb45e;
+  border-bottom: #ffb45e dashed 1px !important;
+  border-top: #ffb45e dashed 1px !important;
+  cursor: pointer;
+  &:hover{
+    color: #ffa537 !important;
+    border-bottom: #ffa537 dashed 1px !important;
+    border-top: #ffa537 dashed 1px !important;
+    background-color: #f8f9fa;
+  }
+}
+.alert{
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

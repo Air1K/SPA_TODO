@@ -2,19 +2,24 @@ import React, {useEffect, useState} from 'react';
 import {Link, useSearchParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {MyFile, Root} from "../../models/root";
-import {Accordion, Alert, Button, Col, Container, FloatingLabel, Form, Modal, Row} from "react-bootstrap";
+import {Alert, Button, Col, Container, FloatingLabel, Form, Modal, Row} from "react-bootstrap";
 import {IoChevronBackOutline} from 'react-icons/io5'
 import styles from './task-style.module.scss'
 import styles_project from '../project/project-style.module.scss'
 import {GrAdd} from "react-icons/gr";
 import Modal1 from "../myModal/modal_1";
 import {vakidateFromAddTask} from "../../validation/validated";
-import {MdDeleteOutline, MdOutlineModeEditOutline, MdOutlineInfo} from 'react-icons/md'
-import {addTaskAction, delTaskAction, editTaskAction} from "../../store/task";
-import {AnimatePresence, motion} from 'framer-motion';
-import {delProjectAction} from "../../store/project";
+import {
+   MdClose,
+   MdOutlineArrowBackIosNew,
+} from 'react-icons/md'
+import {BsLink45Deg} from 'react-icons/bs'
+import {addSubtaskAction, addTaskAction,  editSubtaskAction, editTaskAction} from "../../store/task";
 import {StateEnum} from "../../enums/state.enum";
 import SubTask from "../subTask/sub-task";
+import {SaveStatusEnum} from "../../enums/saveStatus.enum";
+import {saveFile} from "../../service/saveFile";
+import TaskBlock from "./task-block";
 
 const Exit = () => {
    return (
@@ -25,12 +30,11 @@ const Exit = () => {
 }
 const Task = () => {
    const [searchParams, setSearchParams] = useSearchParams();
-
    const dispatch = useDispatch()
    const project = useSelector((state: Root) => state.project.project)
-   const tasks = useSelector((state: Root) => state.task.task.filter(task => task.project_id === Number(searchParams.get('_id'))))
-
-
+   const [subtaskIndex, setSubtaskIndex] = useState(null)
+   const tasks_redux = useSelector((state: Root) => state.task.task.filter(task => task.project_id === Number(searchParams.get('_id'))))
+   const [tasks, setTasks] = useState([])
    const [modalShow, setModalShow] = useState(false)
    const [edit, setEdit] = useState(null)
    const [errors, setErrors] = useState({})
@@ -40,7 +44,7 @@ const Task = () => {
       head_task: '',
       body_task: '',
       priority: 1,
-      files_task: {},
+      files_task: {} as MyFile,
       status: '',
       subtasks: [],
       comments: [],
@@ -59,44 +63,78 @@ const Task = () => {
       }
    }
    const save = (event, types) => {
-      const {formErrors, stateErr} = vakidateFromAddTask(form)
       event.preventDefault();
+      const {formErrors, stateErr} = vakidateFromAddTask(form)
       if (Object.keys(formErrors).length > 0) {
          setErrors(formErrors)
       } else {
-         if (types === 'save') {
-            const project = {
-               project_id: Number(searchParams.get('_id')),
-               id: Date.now(),
-               head_task: form.head_task,
-               body_task: form.body_task,
-               date_of_creat: new Date(),
-               time_at_work: Date.now(),
-               date_end: null,
-               priority: form.priority,
-               files_task: form.files_task,
-               status: StateEnum.QUEUE,
-               subtasks: [],
-               comments: []
+         if (subtaskIndex === null) {
+            switch (types) {
+               case SaveStatusEnum.ADD_TASK:
+                  const taski = {
+                     project_id: Number(searchParams.get('_id')),
+                     id: Date.now(),
+                     head_task: form.head_task,
+                     body_task: form.body_task,
+                     date_of_creat: new Date(),
+                     time_at_work: Date.now(),
+                     date_end: null,
+                     priority: form.priority,
+                     files_task: form.files_task,
+                     status: StateEnum.QUEUE,
+                     subtasks: [],
+                     comments: []
+                  }
+                  dispatch(addTaskAction(taski))
+                  break
+               case SaveStatusEnum.EDIT_TASK:
+                  console.log("EDIT")
+                  dispatch(editTaskAction({
+                     index: edit,
+                     newTaskName: form.head_task,
+                     newBodyTask: form.body_task,
+                     newPriority: form.priority,
+                     newFilesTask: form.files_task,
+                     newStatus: form.status,
+                  }))
+                  break
             }
-            dispatch(addTaskAction(project))
          } else {
-            dispatch(editTaskAction({
-               index: edit,
-               newTaskName: form.head_task,
-               newBodyTask: form.body_task,
-               newPriority: form.priority,
-               newFilesTask: form.files_task,
-               newStatus: form.status,
-            }))
+            switch (types) {
+               case SaveStatusEnum.ADD_SUBTASK:
+                  const taski = [{
+                     project_id: Number(searchParams.get('_id')),
+                     id: Date.now(),
+                     head_task: form.head_task,
+                     body_task: form.body_task,
+                     date_of_creat: new Date(),
+                     time_at_work: Date.now(),
+                     date_end: null,
+                     priority: form.priority,
+                     files_task: form.files_task,
+                     status: StateEnum.QUEUE,
+                     comments: []
+                  }, {task: subtaskIndex}]
+                  dispatch(addSubtaskAction(taski))
+                  break
+               case SaveStatusEnum.EDIT_SUBTASK:
+                  dispatch(editSubtaskAction({
+                     index: edit,
+                     task: subtaskIndex,
+                     newTaskName: form.head_task,
+                     newBodyTask: form.body_task,
+                     newPriority: form.priority,
+                     newFilesTask: form.files_task,
+                     newStatus: form.status,
+                  }))
+                  break
+            }
          }
+
          setEdit(null);
          setModalShow(false);
       }
       setStateErrors(stateErr)
-   }
-   const deleteTask = (id) => {
-      dispatch(delTaskAction(id))
    }
    useEffect(() => {
       if (edit) {
@@ -118,7 +156,7 @@ const Task = () => {
             head_task: '',
             body_task: '',
             priority: 1,
-            files_task: {},
+            files_task: {} as MyFile,
             status: '',
             subtasks: [],
             comments: [],
@@ -129,108 +167,139 @@ const Task = () => {
 
    }, [modalShow])
 
-
+   function getStatus() {
+      if (subtaskIndex !== null) {
+         if (edit) {
+            return SaveStatusEnum.EDIT_SUBTASK
+         } else {
+            return SaveStatusEnum.ADD_SUBTASK
+         }
+      } else {
+         if (edit) {
+            return SaveStatusEnum.EDIT_TASK
+         } else {
+            return SaveStatusEnum.ADD_TASK
+         }
+      }
+   }
+   useEffect(() => {
+      if (subtaskIndex !== null) {
+         setTasks(tasks_redux[subtaskIndex - 1].subtasks)
+      } else {
+         setTasks(tasks_redux)
+      }
+   }, [subtaskIndex])
+   useEffect(() => {
+      if (subtaskIndex !== null) {
+         if (JSON.stringify(tasks_redux[subtaskIndex - 1].subtasks) !== JSON.stringify(tasks)) {
+            setTasks(tasks_redux[subtaskIndex - 1].subtasks)
+         }
+      } else {
+         if (JSON.stringify(tasks_redux) !== JSON.stringify(tasks)) {
+            setTasks(tasks_redux)
+         }
+      }
+   }, [tasks_redux])
+   function deleteFile() {
+      setForm({...form, files_task: {} as MyFile})
+   }
+   
    if (project.findIndex(project => project.name === searchParams.get('name') && project.id === Number(searchParams.get('_id'))) !== -1)
       return (
          <Container className={`mt-2`}>
             <div>
-               <h4 className={`text-center`}>Диспетчер задач</h4>
+               <h4 className={`text-center`}>Диспетчер {subtaskIndex === null ? 'задач' : 'подзадач'}</h4>
                <hr/>
-               <p className={`text-center`}>Выбран проект '{searchParams.get('name')}'</p>
+               <div className={`d-flex justify-content-start gap-2 ${styles.header}`}>
+                  <p className={`text-center`}>Проект <Button variant="secondary" size={'sm'} className={`ms-1`}><Link
+                     className={`d-flex align-items-center gap-2`}
+                     to={'/'}><MdOutlineArrowBackIosNew/> {searchParams.get('name')}</Link></Button></p>
+                  {subtaskIndex === null ? `` :
+                     <p className={`text-center`}>/ Задача <Button variant="secondary" size={'sm'}
+                                                                   onClick={() => setSubtaskIndex(null)}
+                                                                   className={`ms-1`}><span
+                        className={`d-flex align-items-center gap-2`}><MdOutlineArrowBackIosNew/> {`${tasks_redux[subtaskIndex - 1].head_task}`}</span></Button>
+                     </p>}
+               </div>
             </div>
             <Row sm={12} className={`justify-content-center`}>
                <Col sm={4} className={`${styles.col} px-1`}>
                   <div className={styles.head}><h5 className={`text-center`}>Очередь</h5></div>
                   <div className={styles.body}>
                      <div onClick={() => setModalShow(true)}
-                          className={`${styles_project.add_block} ${styles.task_add} transition_v2 mx-auto d-flex justify-content-center align-items-center`}>
+                          className={`${styles_project.add_block} mx-auto d-flex justify-content-center align-items-center`}>
                         <GrAdd/> Добавить
                      </div>
-                     <AnimatePresence mode={"sync"}>
-                        {tasks.map((task, index) =>
-                           <motion.div key={task.id}
-                                       layout
-                                       initial={{scale: 0.8, opacity: 0}}
-                                       animate={{scale: 1, opacity: 1}}
-                                       exit={{scale: 0.8, opacity: 0}}
-                                       transition={{type: "just"}}
-                                       className={'position-relative mt-2'}>
-                              <div className={`${styles.hover_task}`}>
-                                 <Accordion className={`${styles.row_task}`} flush>
-                                    <Accordion.Item eventKey="0">
-                                       <Accordion.Header>{index + 1}. {task.head_task}</Accordion.Header>
-                                       <Accordion.Body>
-                                          <div className={`${styles.body_task}`}>
-                                             <div><span>Номер задачи: </span> {task.id}</div>
-                                             <div><span>Описание: </span> {task.body_task}</div>
-                                             <div><span>Приоритет: </span> {task.priority}</div>
-                                             <div><span>Статус: </span> {task.status}</div>
-                                             <div><span>Кол-во подзадачь: </span> {task.subtasks.length}</div>
-                                             ...
-                                          </div>
-                                          <div
-                                             className={`w-100 d-flex justify-content-center mt-3 ${styles.group_button}`}>
-                                             <Button variant="warning" size={"sm"}
-                                                     className={`mx-1 d-flex align-items-center justify-content-center`}
-                                                     onClick={() => {
-                                                        setModalShow(true)
-                                                        setEdit(index + 1)
-                                                     }}>Изменить
-                                                <MdOutlineModeEditOutline className={`ms-1`}/>
-                                             </Button>
-                                             <Button variant="secondary" size={"sm"}
-                                                     className={`mx-1 d-flex align-items-center justify-content-center`}
-                                                     onClick={() => {
-                                                        setDetailsModal(true)
-                                                        setSearchParams(searchParams + `&task=${index}`)
-                                                     }}>Подробнее
-                                                <MdOutlineInfo className={`ms-1`}/></Button>
-                                             <Button variant="danger" size={"sm"}
-                                                     className={`mx-1 d-flex align-items-center justify-content-center`}
-                                                     onClick={() => deleteTask(task.id)}>Удалить
-                                                <MdDeleteOutline className={`ms-1`}/>
-                                             </Button>
-                                          </div>
-                                       </Accordion.Body>
-                                    </Accordion.Item>
-                                 </Accordion>
-                                 {/*<span>{index + 1}. {task.body_task} {task.priority}</span>*/}
-                              </div>
-                           </motion.div>
-                        )}
-                     </AnimatePresence>
+                     <TaskBlock setDetailsModal={setDetailsModal}
+                                setModalShow={setModalShow}
+                                setEdit={setEdit}
+                                subtaskIndex={subtaskIndex}
+                                tasks={tasks}
+                                setTasks={setTasks}
+                                tasks_redux={tasks_redux}
+                                col={StateEnum.QUEUE}/>
                   </div>
                </Col>
                <Col sm={4} className={`${styles.col} px-1`}>
                   <div className={styles.head}><h5 className={`text-center`}>Разработка</h5></div>
                   <div className={styles.body}>
-
+                     <div onClick={() => setModalShow(true)}
+                          className={`${styles_project.add_block} mx-auto d-flex justify-content-center align-items-center`}
+                           style={{opacity: 0, pointerEvents: 'none'}}>
+                        <GrAdd/> Добавить
+                     </div>
+                     <TaskBlock setDetailsModal={setDetailsModal}
+                                setModalShow={setModalShow}
+                                setEdit={setEdit}
+                                subtaskIndex={subtaskIndex}
+                                tasks={tasks}
+                                setTasks={setTasks}
+                                tasks_redux={tasks_redux}
+                                col={StateEnum.DEVELOPMENT}/>
                   </div>
                </Col>
                <Col sm={4} className={`${styles.col} px-1`}>
                   <div className={styles.head}><h5 className={`text-center`}>Исполнено</h5></div>
                   <div className={styles.body}>
-
+                     <div onClick={() => setModalShow(true)}
+                          className={`${styles_project.add_block} mx-auto d-flex justify-content-center align-items-center`}
+                          style={{opacity: 0, pointerEvents: 'none'}}>
+                        <GrAdd/> Добавить
+                     </div>
+                     <TaskBlock setDetailsModal={setDetailsModal}
+                                setModalShow={setModalShow}
+                                setEdit={setEdit}
+                                subtaskIndex={subtaskIndex}
+                                tasks={tasks}
+                                setTasks={setTasks}
+                                tasks_redux={tasks_redux}
+                                col={StateEnum.DONE}/>
                   </div>
                </Col>
             </Row>
             <Exit/>
 
             {modalShow || detailsModal ?
-               <Modal1 show={detailsModal?detailsModal:modalShow} onHide={() => {
-                  if(!detailsModal){
+               <Modal1 show={detailsModal ? detailsModal : modalShow} onHide={() => {
+                  if (!detailsModal) {
                      setEdit(null);
                      setModalShow(false);
-                  } else{
-                     searchParams.delete('task')
+                  } else {
+                     if (subtaskIndex === null) {
+                        searchParams.delete('task')
+                     } else {
+                        searchParams.delete('subtask')
+                     }
                      setSearchParams(searchParams)
                      setDetailsModal(false)
                   }
-               }}>
-                  {detailsModal?
-                     <SubTask/>
+               }}
+                       size={detailsModal && subtaskIndex === null ? 'xl' : 'lg'}>
+                  {detailsModal ?
+                     <SubTask subtaskIndex={subtaskIndex} setSubtaskIndex={setSubtaskIndex}
+                              setDetailsModal={setDetailsModal}/>
                      :
-                     <Form noValidate validated={!errors} onSubmit={event => save(event, !edit ? 'save' : 'edit')}
+                     <Form noValidate validated={!errors} onSubmit={(event) => save(event, getStatus())}
                            className={'d-block w-100'}>
                         <Modal.Header closeButton>
                            <Modal.Title id="contained-modal-title-vcenter">
@@ -293,17 +362,21 @@ const Task = () => {
                            }}
                                        controlId="formFile"
                                        className="mb-3">
-                              <Form.Label>Вложенные файлы</Form.Label>
+                              <Form.Label>Вложенный файл</Form.Label>
                               <Form.Control isInvalid={!!errors['files_task']}
                                             isValid={stateErrors["files_task"]}
                                             type="file"/>
+                              {form.files_task?.name ?
+                                 <a href={'#'} className={'link-success text-decoration-underline'} download
+                                    onClick={(event) => saveFile(form.files_task, event)}><BsLink45Deg/>{form.files_task.name}
+                                    <a href="#" className={"link-danger"} onClick={(event) => {
+                                       deleteFile();
+                                       event.stopPropagation()
+                                    }}><MdClose/></a></a> : null}
                               <Form.Control.Feedback type="invalid">
                                  {errors['files_task']}
                               </Form.Control.Feedback>
                            </Form.Group>
-                           <div className={`${styles.modal_save} d-block`}>
-
-                           </div>
                         </Modal.Body>
                         <Modal.Footer>
                            <Button variant={'outline-dark'}

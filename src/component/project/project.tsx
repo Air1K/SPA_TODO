@@ -111,7 +111,8 @@ const Project = () => {
             <Modal1 show={modalShow} onHide={() => {
                setEdit(null);
                setModalShow(false);
-            }}>
+            }}
+                    size={'lg'}>
                <Form noValidate validated={!errors} onSubmit={event => save(event, !edit ? 'save' : 'edit')}
                      className={'d-block w-100'}>
                   <Modal.Header closeButton>

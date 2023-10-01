@@ -25,7 +25,7 @@ class StateTask{
    priority: number;
    files_task: MyFile;
    status: string;
-   subtasks: StateTask[] = [];
+   subtasks: StateTask[]=[];
    comments: Comments[] = [];
 }
 class Comments{

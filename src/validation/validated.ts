@@ -65,7 +65,7 @@ function isValidBodyTask(body_task) {
     else if(body_task === undefined || body_task === null) return "Значение названия не определенно"
 }
 function isValidFileTask(file_task){
-    if(file_task.size > 500000) return "Слишком большой размер файла максимальный размер 500КБ"
+    if(file_task?.size > 500000) return "Слишком большой размер файла максимальный размер 500КБ"
 }
 //
 // function isValidatePassword(password){

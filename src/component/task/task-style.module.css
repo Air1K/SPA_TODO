@@ -48,6 +48,14 @@
   font-weight: bold;
 }
 
+.header > p > .element {
+  color: rgb(108, 117, 125);
+  font-weight: bold;
+}
+.header > p > button > a {
+  color: white !important;
+}
+
 @media (max-width: 1400px) {
   .group_button {
     flex-direction: column;

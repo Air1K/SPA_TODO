@@ -27,7 +27,6 @@
   filter: invert(89%) sepia(10%) saturate(3444%) hue-rotate(318deg) brightness(100%) contrast(103%);
 }
 .add_block:hover {
-  transform: scale(1.01);
   border: 2.5px dashed #ffa537;
   color: #ffa537;
 }

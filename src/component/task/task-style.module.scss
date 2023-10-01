@@ -40,18 +40,24 @@
     color: white;
   }
 }
-.hover_task{
-  &:hover{
-    //transform: scale(1.02);
-  }
-}
 .body_task{
   div>span{
     color: rgb(108,117,125);
     font-weight: bold;
   }
 }
+.header{
+  > p {
+    >.element {
+      color: rgb(108, 117, 125);
+      font-weight: bold;
 
+    }
+    >button>a{
+      color: white !important;
+    }
+  }
+}
 @media (max-width: 1400px) {
   .group_button{
     flex-direction: column;
