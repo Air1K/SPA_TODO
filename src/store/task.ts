@@ -89,6 +89,9 @@ export const taskReducer = (state = getTask(), action) =>{
          state.task[action.payload.task - 1].subtasks[action.payload.index - 1].status = action.payload.newStatus
          localStoreSave({...state, task: [...state.task]})
          return {...state}
+      case SaveStatusEnum.ADD_GLOBAL_COMMENT:
+
+         return {...state}
       default:
          return state;
    }
@@ -99,6 +102,7 @@ export const delTaskAction = (payload)=>({type: SaveStatusEnum.DELETE_TASK, payl
 export const editTaskAction = (payload: Edit) =>({type: SaveStatusEnum.EDIT_TASK, payload})
 export const addSubtaskAction = (payload) => ({type: SaveStatusEnum.ADD_SUBTASK, payload})
 export const editSubtaskAction = (payload: EditSub) => ({type: SaveStatusEnum.EDIT_SUBTASK, payload})
+export const addGlobalComment = (payload) => ({type: SaveStatusEnum.ADD_GLOBAL_COMMENT, payload})
 function readSingleFile(file, id) {
 
    if (file?.size) {

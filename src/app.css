@@ -41,6 +41,10 @@ html {
   filter: drop-shadow(2px 2px 2px rgb(217, 217, 52)) !important;
 }
 
+body {
+  overflow-x: hidden;
+}
+
 a {
   color: black;
   text-decoration: none;

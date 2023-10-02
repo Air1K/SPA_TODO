@@ -22,3 +22,18 @@
   align-items: center;
   justify-content: center;
 }
+.nameComment{
+  width: 30%;
+}
+.border{
+  >div>textarea{
+    border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0 !important;
+    &:focus{
+      box-shadow: none !important;
+    }
+  }
+}
+.bottom{
+  border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
+  background-color: #dee2e6;
+}

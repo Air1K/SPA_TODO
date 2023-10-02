@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {MutableRefObject, useEffect, useRef, useState} from 'react';
 import {Link, useSearchParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {MyFile, Root} from "../../models/root";
@@ -14,7 +14,7 @@ import {
    MdOutlineArrowBackIosNew,
 } from 'react-icons/md'
 import {BsLink45Deg} from 'react-icons/bs'
-import {addSubtaskAction, addTaskAction,  editSubtaskAction, editTaskAction} from "../../store/task";
+import {addSubtaskAction, addTaskAction, editSubtaskAction, editTaskAction} from "../../store/task";
 import {StateEnum} from "../../enums/state.enum";
 import SubTask from "../subTask/sub-task";
 import {SaveStatusEnum} from "../../enums/saveStatus.enum";
@@ -40,6 +40,8 @@ const Task = () => {
    const [errors, setErrors] = useState({})
    const [stateErrors, setStateErrors] = useState({})
    const [detailsModal, setDetailsModal] = useState(false)
+   const [editStatus, setEditStatus] = useState('')
+   const [ondrag, setOnDrag] = useState(false)
    const [form, setForm] = useState({
       head_task: '',
       body_task: '',
@@ -49,6 +51,32 @@ const Task = () => {
       subtasks: [],
       comments: [],
    })
+   const editStatusTask = (index) => {
+      switch (getStatus()){
+         case SaveStatusEnum.ADD_TASK || SaveStatusEnum.EDIT_TASK:
+            dispatch(editTaskAction({
+               index: index+1,
+               newTaskName: tasks[index].head_task,
+               newBodyTask: tasks[index].body_task,
+               newPriority: tasks[index].priority,
+               newFilesTask: tasks[index].files_task,
+               newStatus: editStatus,
+            }))
+            break
+         case SaveStatusEnum.ADD_SUBTASK || SaveStatusEnum.EDIT_SUBTASK:
+            dispatch(editSubtaskAction({
+               index: index+1,
+               task: subtaskIndex,
+               newTaskName: tasks[index].head_task,
+               newBodyTask: tasks[index].body_task,
+               newPriority: tasks[index].priority,
+               newFilesTask: tasks[index].files_task,
+               newStatus: editStatus,
+            }))
+            break
+      }
+
+   }
 
    const setField = (field, value) => {
       setForm({
@@ -182,6 +210,7 @@ const Task = () => {
          }
       }
    }
+
    useEffect(() => {
       if (subtaskIndex !== null) {
          setTasks(tasks_redux[subtaskIndex - 1].subtasks)
@@ -200,10 +229,28 @@ const Task = () => {
          }
       }
    }, [tasks_redux])
+
    function deleteFile() {
       setForm({...form, files_task: {} as MyFile})
    }
-   
+
+   function statusTask(event, type) {
+      if (ondrag) {
+         event.target.style.transform = "scale(1.01)"
+         // event.target.style.backgroundColor = "rgba(167,169,169,0.62)"
+         setEditStatus(type)
+      }
+      // console.log(type, ondrag)
+   }
+
+   function statusTaskLeave(event) {
+      if (event.target.style.transform !== "scale(1)") {
+         event.target.style.transform = "scale(1)"
+      }
+   }
+
+
+
    if (project.findIndex(project => project.name === searchParams.get('name') && project.id === Number(searchParams.get('_id'))) !== -1)
       return (
          <Container className={`mt-2`}>
@@ -225,7 +272,9 @@ const Task = () => {
             <Row sm={12} className={`justify-content-center`}>
                <Col sm={4} className={`${styles.col} px-1`}>
                   <div className={styles.head}><h5 className={`text-center`}>Очередь</h5></div>
-                  <div className={styles.body}>
+                  <div onMouseEnter={(event) => statusTask(event, StateEnum.QUEUE)}
+                       onMouseLeave={(event) => statusTaskLeave(event)}
+                       className={`${styles.body} transition_v2 ${!ondrag?styles.resetActiveHover:null}`}>
                      <div onClick={() => setModalShow(true)}
                           className={`${styles_project.add_block} mx-auto d-flex justify-content-center align-items-center`}>
                         <GrAdd/> Добавить
@@ -237,30 +286,16 @@ const Task = () => {
                                 tasks={tasks}
                                 setTasks={setTasks}
                                 tasks_redux={tasks_redux}
-                                col={StateEnum.QUEUE}/>
+                                col={StateEnum.QUEUE}
+                                editStatusTask={editStatusTask}
+                                setOnDrag={setOnDrag}/>
                   </div>
                </Col>
                <Col sm={4} className={`${styles.col} px-1`}>
                   <div className={styles.head}><h5 className={`text-center`}>Разработка</h5></div>
-                  <div className={styles.body}>
-                     <div onClick={() => setModalShow(true)}
-                          className={`${styles_project.add_block} mx-auto d-flex justify-content-center align-items-center`}
-                           style={{opacity: 0, pointerEvents: 'none'}}>
-                        <GrAdd/> Добавить
-                     </div>
-                     <TaskBlock setDetailsModal={setDetailsModal}
-                                setModalShow={setModalShow}
-                                setEdit={setEdit}
-                                subtaskIndex={subtaskIndex}
-                                tasks={tasks}
-                                setTasks={setTasks}
-                                tasks_redux={tasks_redux}
-                                col={StateEnum.DEVELOPMENT}/>
-                  </div>
-               </Col>
-               <Col sm={4} className={`${styles.col} px-1`}>
-                  <div className={styles.head}><h5 className={`text-center`}>Исполнено</h5></div>
-                  <div className={styles.body}>
+                  <div onMouseEnter={(event) => statusTask(event, StateEnum.DEVELOPMENT)}
+                       onMouseLeave={(event) => statusTaskLeave(event)}
+                       className={`${styles.body} transition_v2 ${!ondrag?styles.resetActiveHover:null}`}>
                      <div onClick={() => setModalShow(true)}
                           className={`${styles_project.add_block} mx-auto d-flex justify-content-center align-items-center`}
                           style={{opacity: 0, pointerEvents: 'none'}}>
@@ -273,7 +308,31 @@ const Task = () => {
                                 tasks={tasks}
                                 setTasks={setTasks}
                                 tasks_redux={tasks_redux}
-                                col={StateEnum.DONE}/>
+                                col={StateEnum.DEVELOPMENT}
+                                editStatusTask={editStatusTask}
+                                setOnDrag={setOnDrag}/>
+                  </div>
+               </Col>
+               <Col sm={4} className={`${styles.col} px-1`}>
+                  <div className={styles.head}><h5 className={`text-center`}>Исполнено</h5></div>
+                  <div className={`${styles.body} transition_v2 ${!ondrag?styles.resetActiveHover:null}`}
+                       onMouseEnter={(event) => statusTask(event, StateEnum.DONE)}
+                       onMouseLeave={(event) => statusTaskLeave(event)}>
+                     <div onClick={() => setModalShow(true)}
+                          className={`${styles_project.add_block} mx-auto d-flex justify-content-center align-items-center`}
+                          style={{opacity: 0, pointerEvents: 'none'}}>
+                        <GrAdd/> Добавить
+                     </div>
+                     <TaskBlock setDetailsModal={setDetailsModal}
+                                setModalShow={setModalShow}
+                                setEdit={setEdit}
+                                subtaskIndex={subtaskIndex}
+                                tasks={tasks}
+                                setTasks={setTasks}
+                                tasks_redux={tasks_redux}
+                                col={StateEnum.DONE}
+                                editStatusTask={editStatusTask}
+                                setOnDrag={setOnDrag}/>
                   </div>
                </Col>
             </Row>

@@ -7,7 +7,7 @@ import {delTaskAction} from "../../store/task";
 import {useDispatch} from "react-redux";
 import {useSearchParams} from "react-router-dom";
 
-const TaskBlock = ({tasks, setTasks, tasks_redux, setModalShow, setEdit, setDetailsModal, subtaskIndex, col}) => {
+const TaskBlock = ({tasks, setTasks, tasks_redux, setModalShow, setEdit, setDetailsModal, subtaskIndex, col, editStatusTask, setOnDrag}) => {
    const [searchParams, setSearchParams] = useSearchParams();
    const [styleDrag, setStyleDrag] = useState({})
    const controls = useDragControls()
@@ -21,14 +21,24 @@ const TaskBlock = ({tasks, setTasks, tasks_redux, setModalShow, setEdit, setDeta
          {tasks.map((task, index) =>
             task.status === col ?
                <motion.div drag
-                           onDragStart={()=>setStyleDrag({pointerEvents: "none"})}
-                           onDragEnd={()=>setStyleDrag({pointerEvents: "painted"})}
+                           key={task.id}
+                           onDragStart={(event)=> {
+                              setStyleDrag({pointerEvents: "none"});
+                              // (event.target as HTMLInputElement).style.pointerEvents = "none";
+                              setOnDrag(true)
+                           }}
+                           onDragEnd={(event)=> {
+                              setStyleDrag({pointerEvents: "painted"});
+                              // (event.target as HTMLInputElement).style.pointerEvents = "painted"
+                              editStatusTask(index)
+                              setOnDrag(false)
+                           }}
+                           // onDrop={}
                            dragControls={controls}
                            dragListener={true}
-                           dragSnapToOrigin>
-                  <motion.div key={task.id}
-                              layout
-                              style={styleDrag}
+                           dragSnapToOrigin
+                           style={styleDrag}>
+                  <motion.div layout
                               initial={{scale: 0.8, opacity: 0}}
                               animate={{scale: 1, opacity: 1}}
                               exit={{scale: 0.8, opacity: 0}}

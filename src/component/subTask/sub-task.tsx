@@ -1,12 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import styles from './sub-task-style.module.scss'
-import {Alert, Badge, Button, Col, ListGroup, Modal, Row} from "react-bootstrap";
+import {Alert, Form, Col, FloatingLabel, ListGroup, Modal, Row, Button} from "react-bootstrap";
 import {useSearchParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {Root} from "../../models/root";
+import {Comments, Root} from "../../models/root";
 import moment from "moment";
 import {saveFile} from "../../service/saveFile";
 import {BsLink45Deg} from "react-icons/bs";
+import GetComments from "../comments/get-comments";
+import {addGlobalComment} from "../../store/task";
 
 const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
    const [searchParams, setSearchParams] = useSearchParams();
@@ -15,7 +17,7 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
    const task_redux = useSelector((state: Root) => state.task.task[Number(searchParams.get('task'))])
    const [task, setTask] = useState(task_redux)
    let timer
-
+   const [comment, setComment] = useState<Comments>({name_user: 'default user', comment: ''})
    function getTimeAtWork() {
       const date = new Date()
       const date2 = new Date(task.time_at_work)
@@ -32,29 +34,33 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
       }, 1000)
    }
 
+   function addGlobalComm(){
+      // dispatch(addGlobalComment({...comment, date: new Date()}))
+   }
+
    useEffect(() => {
       getTimeAtWork()
       return () => {
          clearInterval(timer)
       }
-   },[])
+   }, [])
 
-   useEffect(()=>{
-      if(subtaskIndex !== null){
-         if(JSON.stringify(task_redux.subtasks[searchParams.get("subtask")]) !== JSON.stringify(task)){
+   useEffect(() => {
+      if (subtaskIndex !== null) {
+         if (JSON.stringify(task_redux.subtasks[searchParams.get("subtask")]) !== JSON.stringify(task)) {
             setTask(task_redux.subtasks[searchParams.get("subtask")])
          }
-      }else{
-         if(JSON.stringify(task_redux) !== JSON.stringify(task)){
+      } else {
+         if (JSON.stringify(task_redux) !== JSON.stringify(task)) {
             setTask(task_redux)
          }
       }
    }, [task_redux])
 
-   useEffect(()=>{
-      if(subtaskIndex !== null){
+   useEffect(() => {
+      if (subtaskIndex !== null) {
          setTask(task_redux.subtasks[searchParams.get("subtask")])
-      }else{
+      } else {
          setTask(task_redux)
       }
    }, [searchParams])
@@ -76,7 +82,10 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
                      <div><span>Время работы: </span> {sec}</div>
                      <div><span>Приоритет: </span> {task.priority}</div>
                      <div><span>Статус: </span> {task.status}</div>
-                     <div><span>Вложенный файл: </span> {task.files_task?.name?<a href={'#'} className={'link-success text-decoration-underline'} download onClick={(event)=>saveFile(task.files_task, event)}><BsLink45Deg/>{task.files_task.name}</a>:"(пусто)"}</div>
+                     <div><span>Вложенный файл: </span> {task.files_task?.name ?
+                        <a href={'#'} className={'link-success text-decoration-underline'} download
+                           onClick={(event) => saveFile(task.files_task, event)}><BsLink45Deg/>{task.files_task.name}
+                        </a> : "(пусто)"}</div>
                   </div>
                </Col>
                {!subtaskIndex ?
@@ -84,12 +93,13 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
                      <div className={''}><h5>Подзадачи</h5></div>
                      <ListGroup variant="flush">
                         <ListGroup.Item className={`text-center ${styles.add_sub} transition_v2`}
-                                        onClick={()=> {
-                                           setSubtaskIndex(Number(searchParams.get('task'))+1)
+                                        onClick={() => {
+                                           setSubtaskIndex(Number(searchParams.get('task')) + 1)
                                            setDetailsModal(false)
                                         }}>Открыть деспетчер подзадач</ListGroup.Item>
                         {task.subtasks.length ? task.subtasks.map((tas, index) =>
-                           <ListGroup.Item action href="#">{index + 1}. {tas.head_task} {tas.files_task.name}</ListGroup.Item>
+                           <ListGroup.Item action
+                                           href="#">{index + 1}. {tas.head_task} {tas.files_task.name}</ListGroup.Item>
                         ) : <Alert variant={"secondary"} className={`mt-1 ${styles.alert}`}>список пуст :(</Alert>}
                      </ListGroup>
                   </Col> :
@@ -102,7 +112,23 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
             </div>
          </Modal.Body>
          <Modal.Footer>
-
+            <div className={`w-100 d-flex align-items-center`}>
+               <h5>Комментарии</h5>
+               <Form.Control size="sm" type="text" className={`${styles.nameComment} ms-auto`} value={comment.name_user} onChange={(event)=>setComment({...comment, name_user: event.target.value})} placeholder="Ваше имя" />
+            </div>
+            <div className={`w-100 mb-0 ${styles.border}`}>
+               <FloatingLabel controlId="floatingTextarea2" label="Comments">
+                  <Form.Control
+                     value={comment.comment} onChange={(event)=>setComment({...comment, comment: event.target.value})}
+                     as="textarea"
+                     placeholder="Leave a comment here"
+                     style={{ height: '100px' }}
+                  />
+               </FloatingLabel>
+            </div>
+            <div className={`w-100 d-flex justify-content-end mt-0 p-1 ${styles.bottom}`}><Button size={'sm'} onClick={()=>addGlobalComm()}>Сохранить</Button></div>
+            {task.comments.length?<hr className={'w-100'}/>:null}
+            <GetComments comments={task.comments}/>
          </Modal.Footer>
       </div>
    );

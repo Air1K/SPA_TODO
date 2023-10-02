@@ -28,10 +28,11 @@ class StateTask{
    subtasks: StateTask[]=[];
    comments: Comments[] = [];
 }
-class Comments{
+export class Comments{
    name_user: string = 'Default user';
-   date: Date;
+   date?: Date;
    comment: string;
+   comments?: Comments[] = [];
 }
 export interface MyFile extends File {
    readonly lastModifiedDate: Date;

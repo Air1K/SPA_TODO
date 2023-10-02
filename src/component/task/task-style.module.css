@@ -35,6 +35,10 @@
   border-radius: 1rem;
 }
 
+.resetActiveHover {
+  transform: scale(1) !important;
+}
+
 .row_task {
   word-wrap: break-word;
 }
