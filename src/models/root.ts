@@ -29,8 +29,9 @@ class StateTask{
    comments: Comments[] = [];
 }
 export class Comments{
+   id_parent: number
    name_user: string = 'Default user';
-   date?: Date;
+   date?: number;
    comment: string;
    comments?: Comments[] = [];
 }

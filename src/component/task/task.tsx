@@ -1,4 +1,4 @@
-import React, {MutableRefObject, useEffect, useRef, useState} from 'react';
+import React, {MutableRefObject, useCallback, useEffect, useRef, useState} from 'react';
 import {Link, useSearchParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {MyFile, Root} from "../../models/root";
@@ -33,7 +33,7 @@ const Task = () => {
    const dispatch = useDispatch()
    const project = useSelector((state: Root) => state.project.project)
    const [subtaskIndex, setSubtaskIndex] = useState(null)
-   const tasks_redux = useSelector((state: Root) => state.task.task.filter(task => task.project_id === Number(searchParams.get('_id'))))
+   const tasks_redux = useSelector((state: Root) => state.task.task.filter(task => (task.project_id === Number(searchParams.get('_id')))))
    const [tasks, setTasks] = useState([])
    const [modalShow, setModalShow] = useState(false)
    const [edit, setEdit] = useState(null)
@@ -42,6 +42,7 @@ const Task = () => {
    const [detailsModal, setDetailsModal] = useState(false)
    const [editStatus, setEditStatus] = useState('')
    const [ondrag, setOnDrag] = useState(false)
+   const [search, setSearch] = useState('')
    const [form, setForm] = useState({
       head_task: '',
       body_task: '',
@@ -52,10 +53,10 @@ const Task = () => {
       comments: [],
    })
    const editStatusTask = (index) => {
-      switch (getStatus()){
+      switch (getStatus()) {
          case SaveStatusEnum.ADD_TASK || SaveStatusEnum.EDIT_TASK:
             dispatch(editTaskAction({
-               index: index+1,
+               index: index + 1,
                newTaskName: tasks[index].head_task,
                newBodyTask: tasks[index].body_task,
                newPriority: tasks[index].priority,
@@ -65,7 +66,7 @@ const Task = () => {
             break
          case SaveStatusEnum.ADD_SUBTASK || SaveStatusEnum.EDIT_SUBTASK:
             dispatch(editSubtaskAction({
-               index: index+1,
+               index: index + 1,
                task: subtaskIndex,
                newTaskName: tasks[index].head_task,
                newBodyTask: tasks[index].body_task,
@@ -212,22 +213,70 @@ const Task = () => {
    }
 
    useEffect(() => {
+
       if (subtaskIndex !== null) {
-         setTasks(tasks_redux[subtaskIndex - 1].subtasks)
+         if (search === '') {
+            setTasks(tasks_redux[subtaskIndex - 1].subtasks)
+         } else {
+            if (!isNaN(Number(search))) {
+               setTasks(tasks_redux[subtaskIndex - 1].subtasks.filter(task => (task.id.toString().indexOf(search) > -1)))
+            } else {
+               setTasks(tasks_redux[subtaskIndex - 1].subtasks.filter(task => (task.head_task.indexOf(search) > -1)))
+            }
+         }
+
       } else {
-         setTasks(tasks_redux)
+         if (search === '') {
+            setTasks(tasks_redux)
+         } else {
+            if (!isNaN(Number(search))) {
+               setTasks(tasks_redux.filter(task => (task.id.toString().indexOf(search.toString()) > -1)))
+            } else {
+               setTasks(tasks_redux.filter(task => (task.head_task.indexOf(search) > -1)))
+            }
+         }
       }
-   }, [subtaskIndex])
+      console.log("123")
+   }, [subtaskIndex, search])
    useEffect(() => {
       if (subtaskIndex !== null) {
-         if (JSON.stringify(tasks_redux[subtaskIndex - 1].subtasks) !== JSON.stringify(tasks)) {
-            setTasks(tasks_redux[subtaskIndex - 1].subtasks)
+         if (search === '') {
+            if (JSON.stringify(tasks_redux[subtaskIndex - 1].subtasks) !== JSON.stringify(tasks)) {
+               setTasks(tasks_redux[subtaskIndex - 1].subtasks)
+            }
+         } else {
+            if (!isNaN(Number(search))) {
+               if (JSON.stringify(tasks_redux[subtaskIndex - 1].subtasks.filter(task => (task.id.toString().indexOf(search.toString()) > -1))) !== JSON.stringify(tasks)) {
+                  setTasks(tasks_redux[subtaskIndex - 1].subtasks.filter(task => (task.id.toString().indexOf(search.toString()) > -1)))
+               }
+            } else {
+               if (JSON.stringify(tasks_redux[subtaskIndex - 1].subtasks.filter(task => (task.head_task.toString().indexOf(search) > -1))) !== JSON.stringify(tasks)) {
+                  setTasks(tasks_redux[subtaskIndex - 1].subtasks.filter(task => (task.head_task.indexOf(search) > -1)))
+               }
+            }
          }
       } else {
-         if (JSON.stringify(tasks_redux) !== JSON.stringify(tasks)) {
-            setTasks(tasks_redux)
+
+         if (search === '') {
+            if (JSON.stringify(tasks_redux) !== JSON.stringify(tasks)) {
+               setTasks(tasks_redux)
+            }
+         } else {
+            if (!isNaN(Number(search))) {
+               if (JSON.stringify(tasks_redux.filter(task => (task.id.toString().indexOf(search.toString()) > -1))) !== JSON.stringify(tasks)) {
+                  setTasks(tasks_redux.filter(task => (task.id.toString().indexOf(search.toString()) > -1)))
+               }
+               // setTasks(tasks.filter(task=>(task.id.indexOf(search) > -1)))
+            } else {
+               if (JSON.stringify(tasks_redux.filter(task => (task.head_task.indexOf(search) > -1))) !== JSON.stringify(tasks)) {
+                  setTasks(tasks_redux.filter(task => (task.head_task.indexOf(search) > -1)))
+               }
+            }
          }
+
+
       }
+      console.log("345")
    }, [tasks_redux])
 
    function deleteFile() {
@@ -249,6 +298,15 @@ const Task = () => {
       }
    }
 
+   const searchTask = useCallback(() => {
+      console.log()
+      if (!isNaN(Number(search))) {
+         // setTasks(tasks.filter(task=>(task.id.indexOf(search) > -1)))
+      } else {
+         // setTasks(tasks.filter(task=>(task.head_task.indexOf(search) > -1)))
+      }
+      //
+   }, [search])
 
 
    if (project.findIndex(project => project.name === searchParams.get('name') && project.id === Number(searchParams.get('_id'))) !== -1)
@@ -267,6 +325,20 @@ const Task = () => {
                                                                    className={`ms-1`}><span
                         className={`d-flex align-items-center gap-2`}><MdOutlineArrowBackIosNew/> {`${tasks_redux[subtaskIndex - 1].head_task}`}</span></Button>
                      </p>}
+                  <div className={`ms-auto d-flex`}>
+                     <Form.Control
+                        type="search"
+                        placeholder="Поиск"
+                        className={`me-2 rounded-pill ${styles.search}`}
+                        aria-label="Search"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                     />
+                     <Button className={`rounded-pill ${styles.search} py-1`} variant="outline-primary"
+                             onClick={() => searchTask()}>
+                        Найти
+                     </Button>
+                  </div>
                </div>
             </div>
             <Row sm={12} className={`justify-content-center`}>
@@ -274,7 +346,7 @@ const Task = () => {
                   <div className={styles.head}><h5 className={`text-center`}>Очередь</h5></div>
                   <div onMouseEnter={(event) => statusTask(event, StateEnum.QUEUE)}
                        onMouseLeave={(event) => statusTaskLeave(event)}
-                       className={`${styles.body} transition_v2 ${!ondrag?styles.resetActiveHover:null}`}>
+                       className={`${styles.body} transition_v2 ${!ondrag ? styles.resetActiveHover : null}`}>
                      <div onClick={() => setModalShow(true)}
                           className={`${styles_project.add_block} mx-auto d-flex justify-content-center align-items-center`}>
                         <GrAdd/> Добавить
@@ -288,14 +360,15 @@ const Task = () => {
                                 tasks_redux={tasks_redux}
                                 col={StateEnum.QUEUE}
                                 editStatusTask={editStatusTask}
-                                setOnDrag={setOnDrag}/>
+                                setOnDrag={setOnDrag}
+                                getStatus={getStatus}/>
                   </div>
                </Col>
                <Col sm={4} className={`${styles.col} px-1`}>
                   <div className={styles.head}><h5 className={`text-center`}>Разработка</h5></div>
                   <div onMouseEnter={(event) => statusTask(event, StateEnum.DEVELOPMENT)}
                        onMouseLeave={(event) => statusTaskLeave(event)}
-                       className={`${styles.body} transition_v2 ${!ondrag?styles.resetActiveHover:null}`}>
+                       className={`${styles.body} transition_v2 ${!ondrag ? styles.resetActiveHover : null}`}>
                      <div onClick={() => setModalShow(true)}
                           className={`${styles_project.add_block} mx-auto d-flex justify-content-center align-items-center`}
                           style={{opacity: 0, pointerEvents: 'none'}}>
@@ -310,12 +383,13 @@ const Task = () => {
                                 tasks_redux={tasks_redux}
                                 col={StateEnum.DEVELOPMENT}
                                 editStatusTask={editStatusTask}
-                                setOnDrag={setOnDrag}/>
+                                setOnDrag={setOnDrag}
+                                getStatus={getStatus}/>
                   </div>
                </Col>
                <Col sm={4} className={`${styles.col} px-1`}>
                   <div className={styles.head}><h5 className={`text-center`}>Исполнено</h5></div>
-                  <div className={`${styles.body} transition_v2 ${!ondrag?styles.resetActiveHover:null}`}
+                  <div className={`${styles.body} transition_v2 ${!ondrag ? styles.resetActiveHover : null}`}
                        onMouseEnter={(event) => statusTask(event, StateEnum.DONE)}
                        onMouseLeave={(event) => statusTaskLeave(event)}>
                      <div onClick={() => setModalShow(true)}
@@ -332,7 +406,8 @@ const Task = () => {
                                 tasks_redux={tasks_redux}
                                 col={StateEnum.DONE}
                                 editStatusTask={editStatusTask}
-                                setOnDrag={setOnDrag}/>
+                                setOnDrag={setOnDrag}
+                                getStatus={getStatus}/>
                   </div>
                </Col>
             </Row>

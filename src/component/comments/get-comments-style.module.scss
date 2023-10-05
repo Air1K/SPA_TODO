@@ -1,0 +1,42 @@
+.span_el{
+  color: rgb(108,117,125);
+  font-weight: bold;
+}
+.close{
+  cursor: pointer;
+  &:hover{
+    transform: scale(1.02);
+    color: red;
+  }
+}
+.add_coments{
+  cursor: pointer;
+  &:hover{
+    transform: scale(1.02);
+    color: #22ff00;
+  }
+}
+.border{
+  >div>textarea{
+    border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0 !important;
+    &:focus{
+      box-shadow: none !important;
+    }
+  }
+}
+.bottom{
+  border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
+  background-color: #dee2e6;
+}
+.commentsBefore{
+  position: relative;
+  &:before{
+    content: '';
+    position: absolute;
+    background-color: #afafaf;
+    width: 1px;
+    height: 100%;
+    top: 0;
+    left: -10px;
+  }
+}

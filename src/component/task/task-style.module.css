@@ -60,6 +60,10 @@
   color: white !important;
 }
 
+.search {
+  height: 2rem;
+}
+
 @media (max-width: 1400px) {
   .group_button {
     flex-direction: column;

@@ -15,9 +15,10 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
    const dispatch = useDispatch()
    const [sec, setSec] = useState('');
    const task_redux = useSelector((state: Root) => state.task.task[Number(searchParams.get('task'))])
+   const [indexActive, setIndexActive] = useState(null)
    const [task, setTask] = useState(task_redux)
    let timer
-   const [comment, setComment] = useState<Comments>({name_user: 'default user', comment: ''})
+   const [comment, setComment] = useState<Comments>({id_parent: -1, name_user: 'default user', comment: ''})
    function getTimeAtWork() {
       const date = new Date()
       const date2 = new Date(task.time_at_work)
@@ -35,7 +36,11 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
    }
 
    function addGlobalComm(){
-      // dispatch(addGlobalComment({...comment, date: new Date()}))
+      if (subtaskIndex !== null) {
+         dispatch(addGlobalComment({...comment, id_parent: -1, indexTask: Number(searchParams.get('task')), indexSubTask: Number(searchParams.get("subtask"))}))
+      } else {
+         dispatch(addGlobalComment({...comment, id_parent: -1, indexTask: Number(searchParams.get('task')), indexSubTask: null}))
+      }
    }
 
    useEffect(() => {
@@ -128,7 +133,7 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
             </div>
             <div className={`w-100 d-flex justify-content-end mt-0 p-1 ${styles.bottom}`}><Button size={'sm'} onClick={()=>addGlobalComm()}>Сохранить</Button></div>
             {task.comments.length?<hr className={'w-100'}/>:null}
-            <GetComments comments={task.comments}/>
+            <GetComments comments={task.comments} indexActive={indexActive} setIndexActive={setIndexActive}/>
          </Modal.Footer>
       </div>
    );

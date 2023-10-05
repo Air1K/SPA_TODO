@@ -3,18 +3,29 @@ import styles from "./task-style.module.scss";
 import {Accordion, Button} from "react-bootstrap";
 import {MdDeleteOutline, MdOutlineInfo, MdOutlineModeEditOutline} from "react-icons/md";
 import {AnimatePresence, motion, useDragControls} from "framer-motion";
-import {delTaskAction} from "../../store/task";
+import {deleteSubtaskAction, delTaskAction, editSubtaskAction, editTaskAction} from "../../store/task";
 import {useDispatch} from "react-redux";
 import {useSearchParams} from "react-router-dom";
+import {SaveStatusEnum} from "../../enums/saveStatus.enum";
 
-const TaskBlock = ({tasks, setTasks, tasks_redux, setModalShow, setEdit, setDetailsModal, subtaskIndex, col, editStatusTask, setOnDrag}) => {
+const TaskBlock = ({tasks, setTasks, tasks_redux, setModalShow, setEdit, setDetailsModal, subtaskIndex, col, editStatusTask, setOnDrag, getStatus}) => {
    const [searchParams, setSearchParams] = useSearchParams();
    const [styleDrag, setStyleDrag] = useState({})
    const controls = useDragControls()
    const dispatch = useDispatch()
    const deleteTask = (id) => {
-      dispatch(delTaskAction(id))
-      setTasks(tasks_redux)
+      switch (getStatus()){
+         case SaveStatusEnum.ADD_TASK || SaveStatusEnum.EDIT_TASK:
+            dispatch(delTaskAction(id))
+            setTasks(tasks_redux)
+            break
+         case SaveStatusEnum.ADD_SUBTASK || SaveStatusEnum.EDIT_SUBTASK:
+            dispatch(deleteSubtaskAction({
+               id: id,
+               task: subtaskIndex,
+            }))
+            break
+      }
    }
    return (
       <AnimatePresence mode={"sync"}>

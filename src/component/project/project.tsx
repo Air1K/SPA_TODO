@@ -11,10 +11,12 @@ import {MdDeleteOutline, MdOutlineModeEditOutline} from 'react-icons/md'
 import {AnimatePresence, motion} from "framer-motion";
 import {addProjectAction, delProjectAction, editProjectAction} from "../../store/project";
 import {Link} from "react-router-dom";
+import {delTaskAction} from "../../store/task";
 
 const Project = () => {
    const dispatch = useDispatch()
    const project = useSelector((state: Root) => state.project.project)
+   const task = useSelector((state: Root) => state.task.task)
    const [modalShow, setModalShow] = useState(false)
    const [edit, setEdit] = useState(null)
    const [errors, setErrors] = useState({})
@@ -55,6 +57,10 @@ const Project = () => {
       setStateErrors(stateErr)
    }
    const deleteProject = (id) => {
+      const tasks = task.filter(tas=>(tas.project_id === id))
+      for(let i in tasks){
+         dispatch(delTaskAction(task[i].id))
+      }
       dispatch(delProjectAction(id))
    }
    useEffect(() => {
