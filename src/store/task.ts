@@ -7,6 +7,7 @@ interface Edit {
    newPriority: number;
    newFilesTask: Object;
    newStatus: string;
+   newDateEnd?: Date
 }
 
 interface EditSub {
@@ -17,6 +18,7 @@ interface EditSub {
    newPriority: number;
    newFilesTask: Object;
    newStatus: string;
+   newDateEnd?: Date
 }
 
 const getTask = () => {
@@ -131,6 +133,7 @@ export const taskReducer = (state = getTask(), action) => {
          state.task[action.payload.index - 1].priority = action.payload.newPriority
          state.task[action.payload.index - 1].files_task = action.payload.newFilesTask
          state.task[action.payload.index - 1].status = action.payload.newStatus
+         state.task[action.payload.index - 1].date_end = action.payload.newDateEnd
          localStoreSave({...state, task: [...state.task]})
          return {...state, task: [...state.task]}
       case SaveStatusEnum.ADD_SUBTASK:
@@ -143,6 +146,7 @@ export const taskReducer = (state = getTask(), action) => {
          state.task[action.payload.task - 1].subtasks[action.payload.index - 1].priority = action.payload.newPriority
          state.task[action.payload.task - 1].subtasks[action.payload.index - 1].files_task = action.payload.newFilesTask
          state.task[action.payload.task - 1].subtasks[action.payload.index - 1].status = action.payload.newStatus
+         state.task[action.payload.task - 1].subtasks[action.payload.index - 1].date_end = action.payload.newDateEnd
          localStoreSave({...state, task: [...state.task]})
          return {...state}
       case SaveStatusEnum.DELETE_SUBTASK:

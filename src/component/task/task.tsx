@@ -63,25 +63,52 @@ const Task = () => {
       console.log(index, "------------",  editStatus)
       switch (getStatus()) {
          case SaveStatusEnum.ADD_TASK || SaveStatusEnum.EDIT_TASK:
-            dispatch(editTaskAction({
-               index: index + 1,
-               newTaskName: tasks[index].head_task,
-               newBodyTask: tasks[index].body_task,
-               newPriority: tasks[index].priority,
-               newFilesTask: tasks[index].files_task,
-               newStatus: editStatus,
-            }))
+            if(editStatus === StateEnum.DONE){
+               dispatch(editTaskAction({
+                  index: index + 1,
+                  newTaskName: tasks[index].head_task,
+                  newBodyTask: tasks[index].body_task,
+                  newPriority: tasks[index].priority,
+                  newFilesTask: tasks[index].files_task,
+                  newStatus: editStatus,
+                  newDateEnd: new Date()
+               }))
+            } else {
+               dispatch(editTaskAction({
+                  index: index + 1,
+                  newTaskName: tasks[index].head_task,
+                  newBodyTask: tasks[index].body_task,
+                  newPriority: tasks[index].priority,
+                  newFilesTask: tasks[index].files_task,
+                  newStatus: editStatus,
+                  newDateEnd: null
+               }))
+            }
             break
          case SaveStatusEnum.ADD_SUBTASK || SaveStatusEnum.EDIT_SUBTASK:
-            dispatch(editSubtaskAction({
-               index: index + 1,
-               task: subtaskIndex,
-               newTaskName: tasks[index].head_task,
-               newBodyTask: tasks[index].body_task,
-               newPriority: tasks[index].priority,
-               newFilesTask: tasks[index].files_task,
-               newStatus: editStatus,
-            }))
+            if(editStatus === StateEnum.DONE){
+               dispatch(editSubtaskAction({
+                  index: index + 1,
+                  task: subtaskIndex,
+                  newTaskName: tasks[index].head_task,
+                  newBodyTask: tasks[index].body_task,
+                  newPriority: tasks[index].priority,
+                  newFilesTask: tasks[index].files_task,
+                  newStatus: editStatus,
+                  newDateEnd: new Date()
+               }))
+            } else {
+               dispatch(editSubtaskAction({
+                  index: index + 1,
+                  task: subtaskIndex,
+                  newTaskName: tasks[index].head_task,
+                  newBodyTask: tasks[index].body_task,
+                  newPriority: tasks[index].priority,
+                  newFilesTask: tasks[index].files_task,
+                  newStatus: editStatus,
+                  newDateEnd: null
+               }))
+            }
             break
       }
 

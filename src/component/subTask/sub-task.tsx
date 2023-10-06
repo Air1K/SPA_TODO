@@ -9,6 +9,7 @@ import {saveFile} from "../../service/saveFile";
 import {BsLink45Deg} from "react-icons/bs";
 import GetComments from "../comments/get-comments";
 import {addGlobalComment} from "../../store/task";
+import {StateEnum} from "../../enums/state.enum";
 
 const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
    const [searchParams, setSearchParams] = useSearchParams();
@@ -19,8 +20,15 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
    const [task, setTask] = useState(task_redux)
    let timer
    const [comment, setComment] = useState<Comments>({id_parent: -1, name_user: 'default user', comment: ''})
+   console.log(task)
    function getTimeAtWork() {
-      const date = new Date()
+
+      let date
+      if(task.date_end !== null){
+         date = new Date(task.date_end)
+      } else{
+         date = new Date()
+      }
       const date2 = new Date(task.time_at_work)
       const a = moment(date);
       const b = moment(date2);
@@ -32,6 +40,9 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
          const min = Math.floor((c - ((hour * 60 * 60) + (day * 24 * 60 * 60))) / 60)
          const sec = Math.floor((c - ((min * 60) + (hour * 60 * 60) + (day * 24 * 60 * 60))))
          setSec(`д: ${day},  ч: ${hour}, мин: ${min}, сек: ${sec}`)
+         if(task.status === StateEnum.DONE) {
+            clearInterval(timer)
+         }
       }, 1000)
    }
 
@@ -44,11 +55,12 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
    }
 
    useEffect(() => {
+      clearInterval(timer)
       getTimeAtWork()
       return () => {
          clearInterval(timer)
       }
-   }, [])
+   }, [task])
 
    useEffect(() => {
       if (subtaskIndex !== null) {
@@ -85,6 +97,9 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
                      <div><span>Описание: </span> {task.body_task}</div>
                      <div><span>Дата создания: </span> {`${new Date(task.date_of_creat).toLocaleString()}`}</div>
                      <div><span>Время работы: </span> {sec}</div>
+                     {task.status === StateEnum.DONE?
+                        <div><span>Время завершения: </span>{new Date(task.date_end).toLocaleString()}</div>
+                     :null}
                      <div><span>Приоритет: </span> {task.priority}</div>
                      <div><span>Статус: </span> {task.status}</div>
                      <div><span>Вложенный файл: </span> {task.files_task?.name ?
