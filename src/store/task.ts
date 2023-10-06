@@ -174,7 +174,8 @@ export const taskReducer = (state = getTask(), action) => {
          localStoreSave({...state})
          return {...state}
       case SaveStatusEnum.DEL_COMMENT:
-         if (action.payload.indexSubTask !== null) {
+         console.log()
+         if (action.payload.idSubtask !== null) {
             delCommentF(state.task[action.payload.idTask].subtasks[action.payload.idSubtask].comments, action.payload.id)
          } else {
             delCommentF(state.task[action.payload.idTask].comments, action.payload.id)

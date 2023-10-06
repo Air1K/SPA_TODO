@@ -13,6 +13,7 @@
     transition: 1000ms cubic-bezier(.11, .86, .47, 1);
   }
 }
+//*{ touch-action: none; }
 p{
   font-size: 1.1rem;
   font-weight: 300;

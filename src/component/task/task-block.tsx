@@ -8,7 +8,7 @@ import {useDispatch} from "react-redux";
 import {useSearchParams} from "react-router-dom";
 import {SaveStatusEnum} from "../../enums/saveStatus.enum";
 
-const TaskBlock = ({tasks, setTasks, tasks_redux, setModalShow, setEdit, setDetailsModal, subtaskIndex, col, editStatusTask, setOnDrag, getStatus}) => {
+const TaskBlock = ({tasks, setTasks, tasks_redux, setModalShow, setEdit, setDetailsModal, subtaskIndex, col, editStatusTask, setOnDrag, getStatus, setEditStatus}) => {
    const [searchParams, setSearchParams] = useSearchParams();
    const [styleDrag, setStyleDrag] = useState({})
    const controls = useDragControls()
@@ -35,8 +35,8 @@ const TaskBlock = ({tasks, setTasks, tasks_redux, setModalShow, setEdit, setDeta
                            key={task.id}
                            onDragStart={(event)=> {
                               setStyleDrag({pointerEvents: "none"});
-                              // (event.target as HTMLInputElement).style.pointerEvents = "none";
                               setOnDrag(true)
+                              setEditStatus(task.status)
                            }}
                            onDragEnd={(event)=> {
                               setStyleDrag({pointerEvents: "painted"});
@@ -44,7 +44,6 @@ const TaskBlock = ({tasks, setTasks, tasks_redux, setModalShow, setEdit, setDeta
                               editStatusTask(index)
                               setOnDrag(false)
                            }}
-                           // onDrop={}
                            dragControls={controls}
                            dragListener={true}
                            dragSnapToOrigin
@@ -58,7 +57,7 @@ const TaskBlock = ({tasks, setTasks, tasks_redux, setModalShow, setEdit, setDeta
                      <div className={`${styles.hover_task}`}>
                         <Accordion className={`${styles.row_task}`} flush>
                            <Accordion.Item eventKey="0">
-                              <Accordion.Header>{index + 1}. {task.head_task}</Accordion.Header>
+                              <Accordion.Header className={styles.textNoStrock}>{index + 1}. {task.head_task}</Accordion.Header>
                               <Accordion.Body>
                                  <div className={`${styles.body_task}`}>
                                     <div><span>Номер задачи: </span> {task.id}</div>

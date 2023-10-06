@@ -13,8 +13,6 @@ import {Button} from "react-bootstrap";
 const GetComments = ({comments, indexActive, setIndexActive}) => {
    const [searchParams, setSearchParams] = useSearchParams();
    const dispatch = useDispatch()
-   // const comments_redux = useSelector((state: Root) => state.task.task[Number(searchParams.get('task'))].comments)
-   // const [task, setTask] = useState(comments_redux)
    const [commentTarget, setCommentTarget] = useState({name_user: 'default user', comment: ''})
 
    if (!comments?.length) {

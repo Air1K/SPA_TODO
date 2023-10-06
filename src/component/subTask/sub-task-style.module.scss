@@ -37,3 +37,8 @@
   border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
   background-color: #dee2e6;
 }
+@media (max-width: 500px) {
+  .col{
+    flex-direction: column
+  }
+}

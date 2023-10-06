@@ -77,7 +77,7 @@ const SubTask = ({subtaskIndex, setSubtaskIndex, setDetailsModal}) => {
             </Modal.Title>
          </Modal.Header>
          <Modal.Body>
-            <Row>
+            <Row className={styles.col}>
                <Col>
                   <div><h5>Сведения</h5></div>
                   <div className={`${styles.body_task}`}>

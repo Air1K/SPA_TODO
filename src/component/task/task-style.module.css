@@ -18,6 +18,8 @@
 .col {
   min-height: calc(100vh - 10.3rem);
   max-width: 430.5px;
+  min-width: 220px;
+  padding-bottom: 3.3rem;
 }
 .col > .head {
   background-color: rgb(108, 117, 125);
@@ -52,16 +54,43 @@
   font-weight: bold;
 }
 
-.header > p > .element {
+.header .taskDir {
+  flex-wrap: wrap;
+  word-break: break-all;
+}
+.header > div {
+  display: flex;
+  gap: 0.5rem;
+}
+.header > div > p {
+  display: flex;
+}
+.header > div > p > .element {
   color: rgb(108, 117, 125);
   font-weight: bold;
 }
-.header > p > button > a {
+.header > div > p > button > a {
   color: white !important;
+  display: flex;
+  flex-direction: row;
+}
+.header > div > p > button > span {
+  flex-direction: row;
+}
+.header > div > p > span {
+  white-space: nowrap;
+}
+
+.searchs {
+  min-width: 100px;
 }
 
 .search {
   height: 2rem;
+}
+
+.textNoStrock {
+  word-break: break-all;
 }
 
 @media (max-width: 1400px) {
@@ -75,6 +104,9 @@
 @media (max-width: 768px) {
   .group_button > button {
     flex-direction: column;
+  }
+  .col {
+    width: 100%;
   }
 }
 @media (max-width: 576px) {

@@ -17,6 +17,8 @@
 .col{
   min-height: calc(100vh - 10.3rem);
   max-width: 430.5px;
+  min-width: 220px;
+  padding-bottom: 3.3rem;
   >.head{
     background-color: rgb(108,117,125);
     color: white;
@@ -50,19 +52,47 @@
   }
 }
 .header{
-  > p {
-    >.element {
-      color: rgb(108, 117, 125);
-      font-weight: bold;
+  .taskDir{
+    flex-wrap: wrap;
+    word-break: break-all;
+  }
+  >div {
+    display: flex;
+    gap: 0.5rem;
+    > p {
+      display: flex;
 
-    }
-    >button>a{
-      color: white !important;
+      > .element {
+        color: rgb(108, 117, 125);
+        font-weight: bold;
+
+      }
+
+      > button {
+        > a {
+          color: white !important;
+          display: flex;
+          flex-direction: row;
+        }
+        > span {
+          flex-direction: row;
+        }
+      }
+
+      > span {
+        white-space: nowrap;
+      }
     }
   }
 }
+.searchs{
+  min-width: 100px;
+}
 .search{
   height: 2rem;
+}
+.textNoStrock{
+  word-break: break-all;
 }
 @media (max-width: 1400px) {
   .group_button{
@@ -77,6 +107,9 @@
     >button{
       flex-direction: column
     }
+  }
+  .col{
+    width: 100%
   }
 }
 @media (max-width: 576px) {

@@ -20,6 +20,8 @@ import SubTask from "../subTask/sub-task";
 import {SaveStatusEnum} from "../../enums/saveStatus.enum";
 import {saveFile} from "../../service/saveFile";
 import TaskBlock from "./task-block";
+import {Simulate} from "react-dom/test-utils";
+import pointerDown = Simulate.pointerDown;
 
 const Exit = () => {
    return (
@@ -43,6 +45,9 @@ const Task = () => {
    const [editStatus, setEditStatus] = useState('')
    const [ondrag, setOnDrag] = useState(false)
    const [search, setSearch] = useState('')
+   const refQueue = useRef() as MutableRefObject<HTMLDivElement>
+   const refDevelopment = useRef() as MutableRefObject<HTMLDivElement>
+   const refDone = useRef() as MutableRefObject<HTMLDivElement>
    const [form, setForm] = useState({
       head_task: '',
       body_task: '',
@@ -52,7 +57,10 @@ const Task = () => {
       subtasks: [],
       comments: [],
    })
+
+   console.log("999999999")
    const editStatusTask = (index) => {
+      console.log(index, "------------",  editStatus)
       switch (getStatus()) {
          case SaveStatusEnum.ADD_TASK || SaveStatusEnum.EDIT_TASK:
             dispatch(editTaskAction({
@@ -236,7 +244,6 @@ const Task = () => {
             }
          }
       }
-      console.log("123")
    }, [subtaskIndex, search])
    useEffect(() => {
       if (subtaskIndex !== null) {
@@ -273,23 +280,56 @@ const Task = () => {
                }
             }
          }
-
-
       }
-      console.log("345")
    }, [tasks_redux])
 
    function deleteFile() {
       setForm({...form, files_task: {} as MyFile})
    }
 
-   function statusTask(event, type) {
-      if (ondrag) {
-         event.target.style.transform = "scale(1.01)"
-         // event.target.style.backgroundColor = "rgba(167,169,169,0.62)"
-         setEditStatus(type)
+   function statusTask(event, type, mobile?) {
+      if(mobile){
+         const refQx = refQueue.current.getBoundingClientRect().x
+         const refQy = refQueue.current.getBoundingClientRect().y
+         const height_refQ = refQy + refQueue.current.getBoundingClientRect().height
+         const width_refQ = refQx + refQueue.current.getBoundingClientRect().width
+
+         const refDx = refDevelopment.current.getBoundingClientRect().x
+         const refDy = refDevelopment.current.getBoundingClientRect().y
+         const height_refD = refDy + refDevelopment.current.getBoundingClientRect().height
+         const width_refD = refDx + refDevelopment.current.getBoundingClientRect().width
+
+         const refDone_x = refDone.current.getBoundingClientRect().x
+         const refDone_y = refDone.current.getBoundingClientRect().y
+         const height_refDone = refDone_y + refDone.current.getBoundingClientRect().height
+         const width_refDone = refDone_x + refDone.current.getBoundingClientRect().width
+
+         const eventY = event.touches[0].clientY
+         const eventX = event.touches[0].clientX
+
+         if(refQy <= eventY && height_refQ  >= eventY && refQx <= eventX && width_refQ >= eventX){
+            if(StateEnum.QUEUE !== editStatus){
+               setEditStatus(StateEnum.QUEUE)
+            }
+         }
+         if(refDy <= eventY && height_refD  >= eventY && refDx <= eventX && width_refD >= eventX){
+            if(StateEnum.DEVELOPMENT !== editStatus){
+               setEditStatus(StateEnum.DEVELOPMENT)
+            }
+         }
+         if(refDone_y <= eventY && height_refDone  >= eventY && refDone_x <= eventX && width_refDone >= eventX){
+            if(StateEnum.DONE !== editStatus){
+               setEditStatus(StateEnum.DONE)
+            }
+         }
       }
-      // console.log(type, ondrag)
+      else{
+         if (ondrag) {
+            event.target.style.transform = "scale(1.01)"
+            setEditStatus(type)
+         }
+      }
+
    }
 
    function statusTaskLeave(event) {
@@ -298,16 +338,6 @@ const Task = () => {
       }
    }
 
-   const searchTask = useCallback(() => {
-      console.log()
-      if (!isNaN(Number(search))) {
-         // setTasks(tasks.filter(task=>(task.id.indexOf(search) > -1)))
-      } else {
-         // setTasks(tasks.filter(task=>(task.head_task.indexOf(search) > -1)))
-      }
-      //
-   }, [search])
-
 
    if (project.findIndex(project => project.name === searchParams.get('name') && project.id === Number(searchParams.get('_id'))) !== -1)
       return (
@@ -315,17 +345,21 @@ const Task = () => {
             <div>
                <h4 className={`text-center`}>Диспетчер {subtaskIndex === null ? 'задач' : 'подзадач'}</h4>
                <hr/>
-               <div className={`d-flex justify-content-start gap-2 ${styles.header}`}>
-                  <p className={`text-center`}>Проект <Button variant="secondary" size={'sm'} className={`ms-1`}><Link
-                     className={`d-flex align-items-center gap-2`}
-                     to={'/'}><MdOutlineArrowBackIosNew/> {searchParams.get('name')}</Link></Button></p>
-                  {subtaskIndex === null ? `` :
-                     <p className={`text-center`}>/ Задача <Button variant="secondary" size={'sm'}
-                                                                   onClick={() => setSubtaskIndex(null)}
-                                                                   className={`ms-1`}><span
-                        className={`d-flex align-items-center gap-2`}><MdOutlineArrowBackIosNew/> {`${tasks_redux[subtaskIndex - 1].head_task}`}</span></Button>
-                     </p>}
-                  <div className={`ms-auto d-flex`}>
+               <div className={`d-flex justify-content-start flex-column-reverse gap-2 ${styles.header}`}>
+                  <div className={styles.taskDir}>
+                     <p className={`text-center`}><span>Проект </span> <Button variant="secondary" size={'sm'}
+                                                                               className={`ms-1`}><Link
+                        className={`d-flex align-items-center gap-2`}
+                        to={'/'}><MdOutlineArrowBackIosNew/> {searchParams.get('name')}</Link></Button></p>
+                     {subtaskIndex === null ? `` :
+                        <p className={`text-center`}><span>/ Задача</span> <Button variant="secondary" size={'sm'}
+                                                                                   onClick={() => setSubtaskIndex(null)}
+                                                                                   className={`ms-1`}><span
+                           className={`d-flex align-items-center gap-2`}><MdOutlineArrowBackIosNew/> {`${tasks_redux[subtaskIndex - 1].head_task}`}</span></Button>
+                        </p>}
+                  </div>
+
+                  <div className={`ms-auto d-flex ${styles.searchs} flex-row`}>
                      <Form.Control
                         type="search"
                         placeholder="Поиск"
@@ -334,8 +368,7 @@ const Task = () => {
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                      />
-                     <Button className={`rounded-pill ${styles.search} py-1`} variant="outline-primary"
-                             onClick={() => searchTask()}>
+                     <Button className={`rounded-pill ${styles.search} py-1`} variant="outline-primary">
                         Найти
                      </Button>
                   </div>
@@ -344,9 +377,14 @@ const Task = () => {
             <Row sm={12} className={`justify-content-center`}>
                <Col sm={4} className={`${styles.col} px-1`}>
                   <div className={styles.head}><h5 className={`text-center`}>Очередь</h5></div>
-                  <div onMouseEnter={(event) => statusTask(event, StateEnum.QUEUE)}
-                       onMouseLeave={(event) => statusTaskLeave(event)}
-                       className={`${styles.body} transition_v2 ${!ondrag ? styles.resetActiveHover : null}`}>
+                  <div
+                     ref={refQueue}
+                     onPointerEnter={(event) => statusTask(event, StateEnum.QUEUE)}
+                     // onMouseEnter={}
+                     onTouchMove={(event) => statusTask(event, StateEnum.QUEUE, true)}
+                     onPointerLeave={(event) => statusTaskLeave(event)}
+                     // onMouseLeave={}
+                     className={`${styles.body} transition_v2 ${!ondrag ? styles.resetActiveHover : null}`}>
                      <div onClick={() => setModalShow(true)}
                           className={`${styles_project.add_block} mx-auto d-flex justify-content-center align-items-center`}>
                         <GrAdd/> Добавить
@@ -361,13 +399,16 @@ const Task = () => {
                                 col={StateEnum.QUEUE}
                                 editStatusTask={editStatusTask}
                                 setOnDrag={setOnDrag}
-                                getStatus={getStatus}/>
+                                getStatus={getStatus}
+                                setEditStatus={setEditStatus}/>
                   </div>
                </Col>
                <Col sm={4} className={`${styles.col} px-1`}>
                   <div className={styles.head}><h5 className={`text-center`}>Разработка</h5></div>
-                  <div onMouseEnter={(event) => statusTask(event, StateEnum.DEVELOPMENT)}
-                       onMouseLeave={(event) => statusTaskLeave(event)}
+                  <div onPointerEnter={(event) => statusTask(event, StateEnum.DEVELOPMENT)}
+                       onTouchMove={(event) => statusTask(event, StateEnum.DEVELOPMENT, true)}
+                       onPointerLeave={(event) => statusTaskLeave(event)}
+                       ref={refDevelopment}
                        className={`${styles.body} transition_v2 ${!ondrag ? styles.resetActiveHover : null}`}>
                      <div onClick={() => setModalShow(true)}
                           className={`${styles_project.add_block} mx-auto d-flex justify-content-center align-items-center`}
@@ -384,14 +425,18 @@ const Task = () => {
                                 col={StateEnum.DEVELOPMENT}
                                 editStatusTask={editStatusTask}
                                 setOnDrag={setOnDrag}
-                                getStatus={getStatus}/>
+                                getStatus={getStatus}
+                                setEditStatus={setEditStatus}/>
                   </div>
                </Col>
                <Col sm={4} className={`${styles.col} px-1`}>
                   <div className={styles.head}><h5 className={`text-center`}>Исполнено</h5></div>
                   <div className={`${styles.body} transition_v2 ${!ondrag ? styles.resetActiveHover : null}`}
-                       onMouseEnter={(event) => statusTask(event, StateEnum.DONE)}
-                       onMouseLeave={(event) => statusTaskLeave(event)}>
+                       onPointerEnter={(event) => statusTask(event, StateEnum.DONE)}
+                       ref={refDone}
+                       onTouchMove={(event)=>statusTask(event, StateEnum.DONE, true)}
+                       onPointerLeave={(event) => statusTaskLeave(event)}
+                  >
                      <div onClick={() => setModalShow(true)}
                           className={`${styles_project.add_block} mx-auto d-flex justify-content-center align-items-center`}
                           style={{opacity: 0, pointerEvents: 'none'}}>
@@ -407,7 +452,8 @@ const Task = () => {
                                 col={StateEnum.DONE}
                                 editStatusTask={editStatusTask}
                                 setOnDrag={setOnDrag}
-                                getStatus={getStatus}/>
+                                getStatus={getStatus}
+                                setEditStatus={setEditStatus}/>
                   </div>
                </Col>
             </Row>
